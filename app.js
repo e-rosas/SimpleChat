@@ -15,13 +15,16 @@ app.get('/', (req, res) => {
 //Listen on port 3000
 server = app.listen(3000)
 
+//chats
+var chats = [];
+
 //socket.io instantiation
 const io = require("socket.io")(server)
 
 //listen on every connection
 io.on('connection', (socket) => {
-    console.log('Nuevo usuario se ha conectado');
-
+    console.log('Nuevo usuario se ha conectado, chat: ' + socket.id);
+    console.log(io.sockets.adapter.rooms);
     //default username
     socket.username = 'Anonimo'
 
@@ -34,7 +37,7 @@ io.on('connection', (socket) => {
     //Escuchar nuevos mensajes
     socket.on("nuevo_mensaje", (data) => {
         //emitir el nuevo mensaje
-        io.sockets.emit('nuevo_mensaje', {mensaje: data.mensaje, username: socket.username});
+        io.to(socket.id).emit('nuevo_mensaje', {mensaje: data.mensaje, username: socket.username});
     })
 
     //Escuchar escribiendo (evento)
